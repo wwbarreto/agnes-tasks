@@ -1,0 +1,45 @@
+services:
+  tasks_api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+      - USER=agnes
+      - SRC_PATH=/var/www
+    image: tasks_api
+    container_name: tasks_api
+    hostname: tasks_api
+    depends_on:
+    - psql_tasks
+    environment:
+    - POSTGRES_USER=agnes
+    - POSTGRES_DB=tasks
+    - POSTGRES_PASSWORD=senga
+    - POSTGRES_HOST=psql_tasks
+    volumes:
+    - ./:/var/www
+    ports:
+    - 8000:8000
+    networks:
+    - agnes-tasks
+
+  psql_tasks:
+    image: postgres:15-alpine
+    container_name: psql_tasks
+    hostname: psql_tasks
+    environment:
+    - POSTGRES_USER=agnes
+    - POSTGRES_DB=tasks
+    - POSTGRES_PASSWORD=senga
+    volumes:
+    - data:/var/lib/postgresql/data
+    expose:
+    - 5432
+    networks:
+    - agnes-tasks
+
+networks:
+  agnes-tasks:
+
+volumes:
+  data:
